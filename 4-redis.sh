@@ -4,9 +4,7 @@ source ./0-common.sh
 app_name=redis
 
 check_root
-app_setup
-nodejs_setup
-systemd_setup
+
 
 dnf module disable redis -y &>>$LOG_FILE
 VALIDATE $? "Disabling the Redis"
@@ -32,7 +30,4 @@ VALIDATE $? "Enabled the Redis services"
 systemctl start redis &>>$LOG_FILE
 VALIDATE $? "Started the Redis services"
 
-END_TIME=$(date +%s)
-TOTAL_TIME=$(( $END_TIME - $START_TIME ))
-
-echo -e "Script exection completed successfully, $Y time taken: $TOTAL_TIME seconds $N" | tee -a $LOG_FILE
+print_time
