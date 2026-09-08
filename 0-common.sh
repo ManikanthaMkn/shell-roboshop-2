@@ -24,6 +24,51 @@ check_root(){
     fi #IF I am not root → show error and stop. Otherwise → continue.
 }
 
+app_setup(){
+    id roboshop
+    if [ $? -ne 0 ]
+    then
+        useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+        VALIDATE $? "Creating Roboshop systyem user"
+    else
+        echo -e "System User Roboshop is already created ... $Y Skipping $N"
+    fi
+
+    mkdir -p /app
+    VALIDATE $? "Creating app directory"
+
+    curl -o /tmp/$app_name.zip https://roboshop-artifacts.s3.amazonaws.com/$app_name-v3.zip &>>$LOG_FILE
+    VALIDATE $? "Downloading $app_name Files"
+
+    rm -rf /app/*
+    cd /app 
+    unzip /tmp/$app_name.zip &>>$LOG_FILE
+    VALIDATE $? "Moving to app dirctory and Unzipping the downloaded files"
+}
+
+nodejs_setup(){
+    dnf module disable nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Disableing default Nodejs"
+
+    dnf module enable nodejs:20 -y &>>$LOG_FILE
+    VALIDATE $? "Enableing Nodejs 20"
+
+    dnf install nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Installing Nodejs 20"
+
+    npm install &>>$LOG_FILE
+    VALIDATE $? "Installing dependencies"
+}
+
+systemd_setup(){
+    cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service
+    VALIDATE $? "Copying $app_name service"
+
+    systemctl daemon-reload
+    systemctl enable $app_name 
+    systemctl start $app_name
+    VALIDATE $? "Starting $app_name"
+}
 #Validate the function inputs: exit status and the command used for installation.
 VALIDATE(){
     if [ $1 -eq 0 ]
