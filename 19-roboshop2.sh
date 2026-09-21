@@ -8,7 +8,7 @@ DOMAIN_NAME="arohvya.online" #Replace with your DOMAIN NAME
 
 for instance in $@
 do
-    INSTANCE_ID=$(aws ec2 run-instances --image-id ami-0220d79f3f480ecf5 --instance-type t2.micro --security-group-ids sg-052c76aba2d33b868 --tag-specifications "ResourceType=instance,Tags=[{Key=Name, Value=$instance}]" --query "Instances[0].InstanceId" --output text)
+    INSTANCE_ID=$(aws ec2 run-instances --image-id ami-0220d79f3f480ecf5 --instance-type t2.micro --security-group-ids sg-0c515ae895f00d1b4 --tag-specifications "ResourceType=instance,Tags=[{Key=Name, Value=$instance}]" --query "Instances[0].InstanceId" --output text)
     
     if [ $instance != "forntend" ]
     then
